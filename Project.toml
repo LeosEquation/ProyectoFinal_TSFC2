@@ -2,3 +2,10 @@ name = "ProyectoFinal_TSFC2"
 uuid = "e8668912-e156-4b2a-8f85-ab454bcf36fd"
 authors = ["cocol "]
 version = "0.1.0"
+
+[deps]
+IJulia = "7073ff75-c697-5162-941a-fcdaad2a7d2a"
+Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
+NBInclude = "0db19996-df87-5ea3-a455-e3a50d440464"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+TaylorSeries = "6aa5eb33-94cf-58f4-a9d0-e4b2c4fc25ea"
