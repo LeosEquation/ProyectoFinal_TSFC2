@@ -74,57 +74,17 @@ end
 
 function paso_integracion(u::Taylor1,ϵ::Float64)
 
-    N = (length(u)-1):-1:0
-    h = [0.0,0.0]
-    j = 0
-
-    for i in N
-
-        if u[i] != 0 && j < 2
-
-            j += 1
-            h[j] = (ϵ /abs(u[i]))^(1/i)
-
-        end
-
-        if j == 2
-
-            break
-
-        end
-
-    end
+    N = length(u)
+    h = abs.(ϵ ./ u[end-2:end-1]).^(1 ./ [N-3,N-2])
 
     return 0.5*minimum(h)
 end
 
 function paso_integracion(u::Vector{Taylor1{Float64}},ϵ::Float64)
+    
+    N = length.(u)
 
-    H = [[0.0,0.0] for i in 1:length(u)]
-
-    for j in 1:length(u)
-
-        k = 0
-        N = (length(u[j])-1):-1:0
-        
-        for i in N
-
-            if u[j][i] != 0 && k < 2
-
-                k += 1
-                H[j][k] = (ϵ/abs(u[j][i]))^(1/i)
-                
-            end
-
-            if k == 2
-
-                break
-
-            end
-
-        end
-
-    end
+    H = [abs.(ϵ ./ u[i][end-2:end-1]).^(1 ./ [N[i]-3,N[i]-2]) for i in 1:length(u)]
 
     return 0.5*minimum(minimum.(H))
     
@@ -224,15 +184,8 @@ function integracion_taylor(f, x0::Float64, t_ini::Float64, t_fin::Float64, orde
     tt = t_ini
     T = [t_ini]
     X = [x0]
-    Error = Bool[]
 
     Δh = Δt/Nt
-    
-    if h < Δh
-        push!(Error,false)
-    else
-        push!(Error,true)
-    end
 
     if h < Δh || longitud
         h = Δh
@@ -248,12 +201,6 @@ function integracion_taylor(f, x0::Float64, t_ini::Float64, t_fin::Float64, orde
         u, h = paso_taylor(f,t,copy(u),p,ϵ)
         push!(T,tt)
         push!(X,u(0))
-            
-        if h < Δh
-            push!(Error,false)
-        else
-            push!(Error,true)
-        end
 
         if h < Δh || longitud
              h = Δh
@@ -268,14 +215,8 @@ function integracion_taylor(f, x0::Float64, t_ini::Float64, t_fin::Float64, orde
     u = coefs_taylor(f,t,copy(u),p)
     push!(T,t_fin)
     push!(X,u(0))
-        
-    if abs(t_fin - tt) < Δh
-        push!(Error,false)
-    else
-        push!(Error,true)
-    end
 
-    return T, X, all(Error)
+    return T, X
 
 end
 
@@ -319,15 +260,8 @@ function integracion_taylor(f!, x0::Vector{Float64}, t_ini::Float64, t_fin::Floa
     tt = t_ini
     T = [tt]
     X = [x0]
-    Error = Bool[]
 
     Δh = Δt/Nt
-    
-    if h < Δh
-        push!(Error,false)
-    else
-        push!(Error,true)
-    end
 
     if h < Δh || longitud
         h = Δh
@@ -344,12 +278,6 @@ function integracion_taylor(f!, x0::Vector{Float64}, t_ini::Float64, t_fin::Floa
         u .= uu
         push!(T,tt)
         push!(X,u(0))
-            
-        if h < Δh
-            push!(Error,false)
-        else
-            push!(Error,true)
-        end
 
         if h < Δh || longitud
             h = Δh
@@ -364,14 +292,8 @@ function integracion_taylor(f!, x0::Vector{Float64}, t_ini::Float64, t_fin::Floa
     u .= coefs_taylor!(f!,t,du,copy(u),p)
     push!(T,t_fin)
     push!(X,u(0))
-        
-    if abs(t_fin - tt) < Δh
-        push!(Error,false)
-    else
-        push!(Error,true)
-    end
 
-    return T, X, all(Error)
+    return T, X
 
 end
 
